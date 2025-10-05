@@ -4,165 +4,312 @@
 
 Syllabize helps students stay organized by automatically extracting key dates (assignments, exams, readings) from course syllabi and populating their digital calendar with reminders and deadlines.
 
-## Features ✨
+## 📁 Project Files
 
-### Core Features
-- **Syllabus Upload**: Drag-and-drop or select PDF, DOCX, or TXT syllabus files
-- **AI Parsing Engine**: Automatically extracts dates, assignment names, exam info, and descriptions
-- **Calendar Integration**: Syncs with Google Calendar, Outlook, and Apple Calendar
-- **Review Interface**: Preview and edit extracted events before syncing
-- **Smart Notifications**: Customizable reminders for upcoming deadlines
+This project consists of two main components:
 
-### Additional Features
-- **Course Dashboard**: Overview of all courses and upcoming tasks
-- **Progress Tracking**: Visual indicators for task priorities
-- **Multi-format Support**: Handles varied syllabus formatting and language styles
+1. **NLP_AI_reader.py** - Python backend for PDF parsing and keyword extraction
+2. **SyllabizePrototype2.dart** - Flutter mobile application frontend
 
-## Screenshots 📱
+---
 
-- Landing page with app introduction
-- Upload screen with drag-and-drop interface
-- Review screen to edit extracted events
-- Dashboard with upcoming deadlines
-- Settings for calendar integration and notifications
+## 🐍 Backend: NLP_AI_reader.py
 
-## Tech Stack 🛠️
+### Overview
+Python script that uses PyMuPDF to extract text and tables from PDF syllabus files, identifying key information through keyword matching.
 
-### Frontend
-- **Flutter**: Cross-platform mobile app (iOS & Android)
-- **Material Design 3**: Modern, responsive UI components
-
-### Backend (Planned)
-- **Python**: Flask or FastAPI
-- **AI/NLP**: 
-  - PyMuPDF, pdfminer, python-docx for file parsing
-  - spaCy, transformers, or OpenAI API for NLP
-  - dateparser for intelligent date extraction
-- **Calendar APIs**: Google Calendar API, Microsoft Graph API
-
-## Getting Started 🚀
-
-### Prerequisites
-- Flutter SDK (3.0 or higher)
-- Dart 3.0+
-- Android Studio / Xcode for mobile development
+### Features
+- **Text Extraction**: Searches entire PDF for lines containing specified keywords
+- **Table Detection**: Identifies tables within PDFs and extracts rows where keywords appear in any cell
+- **Keyword Matching**: Case-insensitive keyword search across both regular text and table data
+- **Structured Output**: Returns page numbers, line/row content, and table indices
 
 ### Installation
 
-1. Clone the repository
 ```bash
+pip install PyMuPDF
+```
+
+### Usage
+
+```python
+# Define your keywords
+keywords = ["assignment", "exam", "due date", "midterm", "quiz"]
+
+# Specify PDF path
+pdf_file = "syllabus.pdf"
+
+# Extract lines with keywords
+matched_lines = extract_lines_with_keywords(pdf_file, keywords)
+
+# Extract table rows with keywords
+table_results = extract_table_rows_with_keywords(pdf_file, keywords)
+```
+
+### Functions
+
+#### `extract_lines_with_keywords(pdf_path, keywords)`
+Extracts full text lines containing any of the specified keywords.
+
+**Returns:** List of tuples `(page_number, line_text)`
+
+#### `extract_table_rows_with_keywords(pdf_path, keywords)`
+Detects tables and extracts entire rows when keywords are found in any cell.
+
+**Returns:** List of tuples `(page_number, table_index, row_data)`
+
+### Example Output
+
+```
+EXTRACTING LINES WITH KEYWORDS
+==============================================================
+Found 3 matching lines:
+
+Page 2: Assignment 1 due October 15th
+Page 3: Midterm exam scheduled for November 3rd
+Page 5: Final project submission deadline: December 10th
+
+EXTRACTING TABLE ROWS WITH KEYWORDS
+==============================================================
+Found 2 matching table rows:
+
+Page 4, Table 1:
+  Row: Week 5 | October 15 | Assignment 1 Due | 20% of grade
+
+Page 4, Table 1:
+  Row: Week 8 | November 3 | Midterm Exam | Chapters 1-5
+```
+
+---
+
+## 📱 Frontend: SyllabizePrototype2.dart
+
+### Overview
+Flutter mobile application providing a user-friendly interface for syllabus upload, event review, and calendar synchronization.
+
+### Features
+
+#### Landing Page
+- Welcome screen with app branding
+- Feature highlights (Upload, AI Extraction, Calendar Sync)
+- Get Started and Sign In buttons
+
+#### Upload Screen
+- Drag-and-drop syllabus upload interface
+- Supports PDF, DOCX, and TXT formats
+- File picker integration
+
+#### Review Screen
+- Display AI-extracted events (assignments, exams, readings)
+- Color-coded event types:
+  - 🔴 Exams (Red)
+  - 🟠 Assignments (Orange)
+  - 🟢 Readings (Green)
+- Checkbox selection for events to sync
+- Edit functionality for individual events
+- "Sync All" button for calendar integration
+
+#### Dashboard
+- Upcoming deadlines with countdown
+- Course overview with task counts
+- Quick access to all activities
+
+#### Settings
+- Calendar integration options (Google, Outlook, Apple)
+- Notification preferences
+- Reminder customization
+- Version and privacy information
+
+### Installation
+
+#### Prerequisites
+- Flutter SDK (3.0+)
+- Dart 3.0+
+- Android Studio or Xcode
+
+#### Setup
+
+```bash
+# Clone repository
 git clone https://github.com/yourusername/syllabize.git
 cd syllabize
-```
 
-2. Install dependencies
-```bash
+# Install dependencies
 flutter pub get
-```
 
-3. Run the app
-```bash
+# Run the app
 flutter run
 ```
 
-### Running on Different Platforms
+### Screen Navigation
 
-**iOS**
+```
+LandingPage
+    ↓
+HomeScreen (Bottom Navigation)
+    ├── UploadScreen → ReviewScreen
+    ├── DashboardScreen
+    └── SettingsScreen
+```
+
+### UI Components
+
+**Sample Event Data Structure:**
+```dart
+{
+  'title': 'Essay 1: Critical Analysis',
+  'date': DateTime(2025, 10, 15),
+  'type': 'Assignment',
+  'description': '5-7 pages on selected topic',
+  'selected': true,
+}
+```
+
+---
+
+## 🔗 Integration Architecture
+
+```
+┌─────────────────────┐
+│  Flutter App (UI)   │
+│  SyllabizePrototype │
+└──────────┬──────────┘
+           │
+           │ File Upload
+           ↓
+┌─────────────────────┐
+│   Backend API       │
+│   (To be built)     │
+└──────────┬──────────┘
+           │
+           │ PDF Processing
+           ↓
+┌─────────────────────┐
+│  NLP_AI_reader.py   │
+│  PyMuPDF + Keywords │
+└──────────┬──────────┘
+           │
+           │ Extracted Data
+           ↓
+┌─────────────────────┐
+│  Calendar APIs      │
+│  Google/Outlook/    │
+│  Apple Calendar     │
+└─────────────────────┘
+```
+
+## 🚀 Quick Start
+
+### 1. Test the Python Parser
+
 ```bash
-flutter run -d ios
+# Edit keywords in NLP_AI_reader.py
+keywords = ["assignment", "exam", "quiz", "project"]
+
+# Run the script
+python NLP_AI_reader.py
 ```
 
-**Android**
+### 2. Run the Flutter App
+
 ```bash
-flutter run -d android
+# Start the app
+flutter run
+
+# Or for specific platform
+flutter run -d ios      # iOS
+flutter run -d android  # Android
+flutter run -d chrome   # Web (testing)
 ```
 
-**Web** (for testing)
-```bash
-flutter run -d chrome
-```
+## 🎯 Roadmap
 
-## Project Structure 📁
+### Phase 1: Core Functionality
+- [x] Python PDF parser with keyword extraction
+- [x] Table detection and row extraction
+- [x] Flutter UI with all screens
+- [x] Landing page and navigation
+- [ ] Backend API development (Flask/FastAPI)
+- [ ] Connect Flutter to Python backend
 
-```
-syllabize/
-├── lib/
-│   ├── main.dart                 # App entry point
-│   ├── screens/
-│   │   ├── landing_page.dart     # Welcome screen
-│   │   ├── upload_screen.dart    # Syllabus upload
-│   │   ├── review_screen.dart    # Event review/edit
-│   │   ├── dashboard_screen.dart # Course overview
-│   │   └── settings_screen.dart  # App settings
-│   ├── models/
-│   │   └── event.dart            # Event data models
-│   └── services/
-│       ├── file_service.dart     # File handling
-│       ├── api_service.dart      # Backend communication
-│       └── calendar_service.dart # Calendar integration
-├── assets/                        # Images and resources
-└── test/                         # Unit and widget tests
-```
+### Phase 2: AI Enhancement
+- [ ] Advanced NLP for date parsing
+- [ ] Event type classification
+- [ ] Course name detection
+- [ ] Assignment weight extraction
 
-## Roadmap 🗺️
+### Phase 3: Calendar Integration
+- [ ] Google Calendar API
+- [ ] Microsoft Outlook API
+- [ ] Apple Calendar sync
+- [ ] iCal export option
 
-- [x] Landing page
-- [x] Upload interface
-- [x] Review screen with edit functionality
-- [x] Dashboard with upcoming tasks
-- [x] Settings page
-- [ ] Backend AI parsing integration
-- [ ] Calendar API implementation
+### Phase 4: Polish
 - [ ] File upload functionality
 - [ ] Push notifications
 - [ ] Progress tracking
-- [ ] Multi-course support
+- [ ] Multi-course management
+- [ ] Cloud storage integration
 
-## Usage 💡
+## 🛠️ Tech Stack
 
-1. **Upload Syllabus**: Tap the upload button and select your course syllabus
-2. **AI Processing**: The app extracts all assignments, exams, and readings
-3. **Review Events**: Check and edit extracted dates and descriptions
-4. **Sync Calendar**: Confirm to add events to your connected calendar
-5. **Stay Organized**: Receive reminders and track your progress
+**Backend:**
+- Python 3.8+
+- PyMuPDF (fitz) for PDF processing
+- Future: Flask/FastAPI for REST API
 
-## Success Metrics 📊
+**Frontend:**
+- Flutter 3.0+
+- Material Design 3
+- Dart 3.0+
 
-- 90%+ accuracy in date extraction
-- <5 minutes average time to process and sync a syllabus
-- 80%+ user satisfaction in usability surveys
+**APIs (Planned):**
+- Google Calendar API
+- Microsoft Graph API (Outlook)
+- Apple Calendar
 
-## Contributing 🤝
+## 📝 File Structure
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```
+syllabize/
+├── NLP_AI_reader.py              # Backend PDF parser
+├── SyllabizePrototype2.dart      # Flutter app
+├── README.md                     # This file
+└── (future)
+    ├── backend/
+    │   ├── api/
+    │   ├── models/
+    │   └── services/
+    └── frontend/
+        ├── lib/
+        ├── assets/
+        └── test/
+```
+
+## 🤝 Contributing
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## Privacy & Security 🔒
+## 🔒 Privacy & Security
 
 - Secure file handling with automatic deletion after processing
 - No permanent storage of syllabus content
 - Calendar access only with explicit user permission
 - Data encryption in transit
+- Local processing when possible
 
-## License 📄
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
-## Support 💬
+## 📧 Contact
 
-For questions or support, please open an issue on GitHub or contact support@syllabize.app
-
-## Acknowledgments 🙏
-
-- Built with Flutter and Material Design 3
-- AI parsing powered by state-of-the-art NLP models
-- Inspired by the needs of busy students everywhere
+For questions or support, please open an issue on GitHub
 
 ---
 
-Made with ❤️ for students by students
+**Made with ❤️ for students by students**
